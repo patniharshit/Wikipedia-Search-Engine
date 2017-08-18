@@ -22,7 +22,10 @@ def write_to_disk():
     file = open("testfile.txt","w")
     ans = sorted(freq, key=lambda key: freq[key])
     for key in ans:
-        file.write(str(key) + ": " + str(freq[key]) + "\n")
+        file.write(str(key) + ": ")
+        for entry in freq[key]:
+            print('inhere')
+            file.write('d'+str(entry[0])+'t'+str(entry[1])+'b'+str(entry[2])+'|')
 
 def update_dict(id, term_list, cat):
     if cat == 't':
@@ -47,13 +50,13 @@ def update_dict(id, term_list, cat):
                             val = freq[term][i]
                             freq[term][i] = (id, val[1], val[2]+1)
 
-
 def process_text(text):
     tokens = re.split(r"[^A-Za-z]+", text)
-    casing = list(map(lambda w: w.lower(), tokens))
-    sw_removed = list(filter(lambda w: not stop_words.isStopWord(w), casing))
-    stemmed = list(map(lambda w: stemmer.stem(w), sw_removed))
-    return stemmed
+    temp = []
+    for w in tokens:
+        if not stop_words.isStopWord(w):
+            temp.append(stemmer.stem(w.lower()))
+    return temp
 
 
 def strip_tag_name(t):
