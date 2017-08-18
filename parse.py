@@ -2,6 +2,7 @@ import xml.etree.ElementTree as etree
 import os
 import sys
 import re
+import ipdb;
 from stopWords import StopWords
 from nltk.stem.porter import PorterStemmer
 
@@ -21,7 +22,7 @@ def write_to_disk():
     file = open("testfile.txt","w")
     ans = sorted(freq, key=lambda key: freq[key])
     for key in ans:
-        file.write(str(key) + " " + str(freq[key]) + "\n")
+        file.write(str(key) + ": " + str(freq[key]) + "\n")
 
 def update_dict(id, term_list, cat):
     if cat == 't':
@@ -38,10 +39,13 @@ def update_dict(id, term_list, cat):
             if term not in freq:
                 freq[term] = [(id, 0, 1)]
             else:
-                for i in range(len(freq[term])):
-                    if freq[term][i][0] == id:
-                        val = freq[term][i]
-                        freq[term][i] = (id, val[1], val[2]+1)
+                if freq[term][-1][0] < id:
+                    freq[term].append((id, 0, 1))
+                else:
+                    for i in range(len(freq[term])):
+                        if freq[term][i][0] == id:
+                            val = freq[term][i]
+                            freq[term][i] = (id, val[1], val[2]+1)
 
 
 def process_text(text):
@@ -81,8 +85,8 @@ for event, elem in etree.iterparse(pathWikiXML, events=('start', 'end')):
     else:
         if tname == 'title':
             title = elem.text
-            title_terms = process_text(elem.text)
-            update_dict(id, title_terms, 't')
+            # title_terms = process_text(elem.text)
+            #update_dict(id, title_terms, 't')
         elif tname == 'id' and not inrevision:
             id = int(elem.text)
         elif tname == 'redirect':
@@ -90,7 +94,7 @@ for event, elem in etree.iterparse(pathWikiXML, events=('start', 'end')):
         elif tname == 'page':
             totalCount += 1
             print(totalCount)
-            if totalCount > 100:
+            if totalCount > 1000000:
                 break
         elif tname == 'text':
             if elem.text is not None:
