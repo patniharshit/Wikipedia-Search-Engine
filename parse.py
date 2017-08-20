@@ -24,31 +24,7 @@ def write_to_disk():
     file = open("testfile.txt", "w")
     ans = sorted(freq, key=lambda key: freq[key])
     for key in ans:
-        file.write(str(key) + ": "+str(freq[key])+'\n')
-
-
-"""def update_dict(id, term_list, cat):
-    if cat == 't':
-        for term in term_list:
-            if term not in freq:
-                freq[term] = [(id, 1, 0)]
-            else:
-                for i in range(len(freq[term])):
-                    if freq[term][i][0] == id:
-                        val = freq[term][i]
-                        freq[term][i] = (id, val[1]+1, val[2])
-    elif cat == 'b':
-        for term in term_list:
-            if term not in freq:
-                freq[term] = [(id, 0, 1)]
-            else:
-                if freq[term][-1][0] < id:
-                    freq[term].append((id, 0, 1))
-                else:
-                    for i in range(len(freq[term])):
-                        if freq[term][i][0] == id:
-                            val = freq[term][i]
-                            freq[term][i] = (id, val[1], val[2]+1)"""
+        file.write(str(key)+":"+str(freq[key])+'\n')
 
 
 def update_dict(cat):
@@ -57,16 +33,17 @@ def update_dict(cat):
     elif cat == 'b':
         for key in doc_freq:
             if key not in freq:
-                freq[key] = 'd'+str(id)+'t0b1|'
+                freq[key] = 'd'+str(id)+'t0b1'
             else:
-                freq[key] = freq[key] + str('d'+str(id)+'t0b'+str(doc_freq[key][1]+1)+'|')
+                freq[key] = freq[key] + str('|d'+str(id)+'t0b'+str(doc_freq[key][1]+1))
 
 
 def process_text(text):
+    # ipdb.set_trace()
     tokens = re.split(r"[^A-Za-z]+", text)
     temp = []
     for w in tokens:
-        if not stop_words.isStopWord(w):
+        if not stop_words.isStopWord(w.lower()):
             temp.append(stemmer.stem(w.lower()))
     return temp
 
@@ -102,15 +79,13 @@ for event, elem in etree.iterparse(pathWikiXML, events=('start', 'end')):
         if tname == 'title':
             title = elem.text
             # title_terms = process_text(elem.text)
-            #update_dict(id, title_terms, 't')
+            # update_dict(id, title_terms, 't')
         elif tname == 'id' and not inrevision:
             id = int(elem.text)
-        elif tname == 'redirect':
-            redirect = elem.attrib['title']
         elif tname == 'page':
             totalCount += 1
             print(totalCount)
-            if totalCount > 1000000000:
+            if totalCount > 100000000:
                 break
         elif tname == 'text':
             if elem.text is not None:
