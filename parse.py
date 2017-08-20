@@ -4,7 +4,7 @@ import sys
 import re
 import ipdb;
 from stopWords import StopWords
-from nltk.stem.porter import PorterStemmer
+from Stemmer import Stemmer
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -15,7 +15,7 @@ ENCODING = "utf-8"
 
 stop_words = StopWords()
 stop_words.readStopWords()
-stemmer = PorterStemmer()
+stemmer = Stemmer('english')
 freq = {}
 doc_freq = {}
 
@@ -44,7 +44,7 @@ def process_text(text):
     temp = []
     for w in tokens:
         if not stop_words.isStopWord(w.lower()):
-            temp.append(stemmer.stem(w.lower()))
+            temp.append(stemmer.stemWord(w.lower()))
     return temp
 
 
