@@ -4,10 +4,11 @@ import sys
 import re
 from stopWords import StopWords
 from Stemmer import Stemmer
-from parse_xml import WikiArticle
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+
+argv = sys.argv
 
 PATH_WIKI_XML = './'
 FILENAME_WIKI = './wiki-search-small.xml'
@@ -30,9 +31,10 @@ def getCategories(text):
             temp = match.group(1).split("|")
             if temp:
                 cate.extend(temp)
-    re.sub(category_detection, ' ', text)
-    return cate
-
+    data = ' '.join(cate)
+    tokenisedWords = re.findall("\d+|[\w]+", data)
+    tokenisedWords = [key.encode('utf-8') for key in tokenisedWords]
+    return tokenisedWords
 
 def getExternalLinks(text):
     links = []
@@ -46,14 +48,18 @@ def getExternalLinks(text):
                 temp = lines[i].split(' ')
                 temp = temp[2:]
                 word = [key for key in temp if 'http' not in temp]
+                word = ' '.join(word).encode('utf-8')
                 links.append(word)
-    return links
+    data = ' '.join(links)
+    tokenisedWords = re.findall("\d+|[\w]+", data)
+    tokenisedWords = [key.encode('utf-8') for key in tokenisedWords]
+    return tokenisedWords
 
 
 def write_to_disk():
-    file = open("testfile.txt", "w")
-    ans = sorted(freq, key=lambda key: freq[key])
-    for key in ans:
+    file = open(argv[2], "w")
+    # ans = sorted(freq, key=lambda key: freq[key])
+    for key in sorted(freq.keys()):
         file.write(str(key)+":"+str(freq[key])+'\n')
 
 
@@ -123,7 +129,7 @@ totalCount = 0
 articleCount = 0
 title = None
 
-for event, elem in etree.iterparse(pathWikiXML, events=('start', 'end')):
+for event, elem in etree.iterparse(argv[1], events=('start', 'end')):
     tname = strip_tag_name(elem.tag)
 
     if event == 'start':
@@ -151,14 +157,12 @@ for event, elem in etree.iterparse(pathWikiXML, events=('start', 'end')):
         elif tname == 'page':
             totalCount += 1
             print(totalCount)
-            if totalCount > 10000000000:
+            if totalCount > 100:
                 break
         elif tname == 'text':
             if elem.text is not None:
                 templinks = getExternalLinks(elem.text)
-                external_links = []
-                for link_arr in templinks:
-                    external_links.extend(link_arr)
+                external_links = templinks
 
                 categories = getCategories(str(elem.text))
 
@@ -185,7 +189,6 @@ for event, elem in etree.iterparse(pathWikiXML, events=('start', 'end')):
                     else:
                         hold = doc_freq[w]
                         doc_freq[w] = (hold[0], hold[1], hold[2], hold[3]+1)
-
                 update_dict(id)
         elem.clear()
 
