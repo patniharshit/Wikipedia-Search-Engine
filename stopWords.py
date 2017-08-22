@@ -1,3 +1,7 @@
+from Stemmer import Stemmer
+
+stemmer = Stemmer('english')
+
 class StopWords:
     "Load stop words from stopWords.txt to a set"
 
@@ -10,11 +14,12 @@ class StopWords:
             for input_line_raw in input_file:
                 input_tokens = input_line_raw.split(', ')
                 self.stopWordsList.extend(input_tokens)
+                input_tokens = list(map(stemmer.stemWord, input_tokens))
             self.stopWordsSet = set(self.stopWordsList)
 
     def isStopWord(self, token):
         try:
-            if token in self.stopWordsSet:
+            if token in self.stopWordsSet or len(token) < 3 or len(token) > 20:
                 return True
             else:
                 return False
