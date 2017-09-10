@@ -69,14 +69,22 @@ def write_to_disk(cntr):
     links_str = ""
     for key in sorted(freq.keys()):
         for tup in freq[key]:
-            body_str += str(tup[0])+'b'+str(tup[1])+'|'
-            title_str += str(tup[0])+'t'+str(tup[2])+'|'
-            categ_str += str(tup[0])+'c'+str(tup[3])+'|'
-            links_str += str(tup[0])+'l'+str(tup[4])+'|'
-        bodyfile.write(str(key)+":"+str(body_str)+'\n')
-        titlefile.write(str(key)+":"+str(title_str)+'\n')
-        categfile.write(str(key)+":"+str(categ_str)+'\n')
-        linksfile.write(str(key)+":"+str(links_str)+'\n')
+            if(tup[1] != 0):
+                body_str += str(tup[0])+'b'+str(tup[1])+'|'
+            if(tup[2] != 0):
+                title_str += str(tup[0])+'t'+str(tup[2])+'|'
+            if(tup[3] != 0):
+                categ_str += str(tup[0])+'c'+str(tup[3])+'|'
+            if(tup[4] != 0):
+                links_str += str(tup[0])+'l'+str(tup[4])+'|'
+        if(body_str):
+            bodyfile.write(str(key)+":"+str(body_str)+'\n')
+        if(title_str):
+            titlefile.write(str(key)+":"+str(title_str)+'\n')
+        if(categ_str):
+            categfile.write(str(key)+":"+str(categ_str)+'\n')
+        if(links_str):
+            linksfile.write(str(key)+":"+str(links_str)+'\n')
         body_str = ""
         title_str = ""
         categ_str = ""

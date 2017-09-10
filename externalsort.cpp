@@ -29,7 +29,7 @@ class CompareDist {
 
 priority_queue<pair<vector<string>, int>, vector<pair<vector<string>, int> >, CompareDist> myheap;
 
-void mergeFiles() {
+void mergeFiles(string field) {
     int noSplits = num_blocks;
     int OB = 0.2 * (double)memory_size;
     // cout << "memory_size: " << memory_size << endl;
@@ -41,7 +41,7 @@ void mergeFiles() {
 
     // Store all file pointers in an array
     for(int i=0; i<noSplits; i++) {
-        ifstream *file = new ifstream(("index/file" + to_string(i)).c_str());
+        ifstream *file = new ifstream(("index/" + field + to_string(i)).c_str());
         fPointers.push_back(file);
     }
 
@@ -163,7 +163,7 @@ void mergeFiles() {
     fPointers.erase(fPointers.begin(), fPointers.end());
     outFile.close();
 
-    string merged_postings = "mergedindex.txt";
+    string merged_postings = "index/" + field + ".index";
     ifstream *ff = new ifstream("finalindex.txt");
     string aline, prev = "", curr;
 
@@ -202,7 +202,10 @@ int main(int argc, char* argv[]) {
 
     num_blocks = stoi(argv[1]);
 
-    mergeFiles();
+    mergeFiles("body");
+    mergeFiles("title");
+    mergeFiles("categ");
+    mergeFiles("links");
 
     return 0;
 }
