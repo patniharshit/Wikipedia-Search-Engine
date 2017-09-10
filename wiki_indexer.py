@@ -23,6 +23,7 @@ category_detection = re.compile(u"\[\[Category:(.*?)\]\]", re.M)
 file_cntr = 0
 file_step = 500
 
+
 def getCategories(text):
     cate = []
     matches = re.finditer(category_detection, text)
@@ -58,11 +59,31 @@ def getExternalLinks(text):
 
 
 def write_to_disk(cntr):
-    file = open('./index/file'+str(cntr), "w")
+    bodyfile = open('./index/body'+str(cntr), "w")
+    titlefile = open('./index/title'+str(cntr), "w")
+    categfile = open('./index/categ'+str(cntr), "w")
+    linksfile = open('./index/links'+str(cntr), "w")
+    body_str = ""
+    title_str = ""
+    categ_str = ""
+    links_str = ""
     for key in sorted(freq.keys()):
-        file.write(str(key)+":"+str(freq[key])+'\n')
+        for tup in freq[key]:
+            body_str += str(tup[0])+'b'+str(tup[1])+'|'
+            title_str += str(tup[0])+'t'+str(tup[2])+'|'
+            categ_str += str(tup[0])+'c'+str(tup[3])+'|'
+            links_str += str(tup[0])+'l'+str(tup[4])+'|'
+        bodyfile.write(str(key)+":"+str(body_str)+'\n')
+        titlefile.write(str(key)+":"+str(title_str)+'\n')
+        categfile.write(str(key)+":"+str(categ_str)+'\n')
+        linksfile.write(str(key)+":"+str(links_str)+'\n')
+        body_str = ""
+        title_str = ""
+        categ_str = ""
+        links_str = ""
 
 def update_dict(docid):
+    flg = False
     for key in doc_freq:
         if key == '':
             continue
@@ -70,19 +91,11 @@ def update_dict(docid):
         t = doc_freq[key][1]
         e = doc_freq[key][2]
         c = doc_freq[key][3]
-        strg = 'd'+str(id)
-        if b > 0:
-            strg = strg + 'b' + str(b)
-        if t > 0:
-            strg = strg + 't' + str(t)
-        if e > 0:
-            strg = strg + 'e' + str(e)
-        if c > 0:
-            strg = strg + 'c' + str(c)
         if key not in freq:
-            freq[key] = strg
+            freq[key] = []
+            freq[key].append((docid, b, t, e, c))
         else:
-            freq[key] = freq[key] + '|' + strg
+            freq[key].append((docid, b, t, e, c))
 
 
 def process_body_text(text):
@@ -156,7 +169,12 @@ for event, elem in etree.iterparse(argv[1], events=('start', 'end')):
         elif tname == 'page':
             totalCount += 1
             print(totalCount)
-            if totalCount > 100000000:
+            if totalCount > 600:
+                write_to_disk(file_cntr)
+                elem.clear()
+                freq.clear()
+                doc_freq.clear()
+                file_cntr = file_cntr + 1
                 break
             if totalCount % file_step == 0:
                 write_to_disk(file_cntr)
