@@ -4,6 +4,7 @@
 #include<cstring>
 #include<fstream>
 #include<sstream>
+#include<math.h>
 
 using namespace std;
 
@@ -12,6 +13,12 @@ vector<ifstream* > fPointers;
 string output_file;
 int memory_size;
 int save_buffer = 1024;
+int num_doc;
+
+string tfidf(int tf, int idf) {
+    string ans = to_string((1+log(tf))*log(num_doc/idf));
+    return ans;
+}
 
 class CompareDist {
     public:
@@ -132,7 +139,15 @@ void mergeFiles(string field) {
             for(int i=0; i<record_buff.size(); i++) {;
                 str_rec = record_buff[i][0];
                 for(int j=1; j<record_buff[i].size(); j++) {
-                    str_rec += " " + record_buff[i][j];
+                    int k;
+                    for(k=0; k<record_buff[i][j].size(); k++) {
+                        if(record_buff[i][j][k] == 'x') {
+                            break;
+                        }
+                    }
+                    string docid = record_buff[i][j].substr(0,k);
+                    string num_occ = record_buff[i][j].substr(k+1, record_buff[i][j].size());
+                    str_rec += " " + docid + " " + tfidf(stoi(num_occ), (int)record_buff[i][j].size());
                 }
                 str_rec += "\n";
                 outFile << str_rec;
@@ -147,7 +162,15 @@ void mergeFiles(string field) {
         for(int i=0; i<record_buff.size(); i++) {
             str_rec = record_buff[i][0];
             for(int j=1; j<record_buff[i].size(); j++) {
-                str_rec += " " + record_buff[i][j];
+                int k;
+                for(k=0; k<record_buff[i][j].size(); k++) {
+                    if(record_buff[i][j][k]=='x') {
+                        break;
+                    }
+                }
+                string docid = record_buff[i][j].substr(0,k);
+                string num_occ = record_buff[i][j].substr(k+1, record_buff[i][j].size());
+                str_rec += " " + docid + " " + tfidf(stoi(num_occ), (int)record_buff[i][j].size());
             }
             str_rec += "\n";
             outFile << str_rec;
@@ -197,6 +220,11 @@ void mergeFiles(string field) {
 }
 
 int main(int argc, char* argv[]) {
+    string line;
+    ifstream f ("./cntfile");
+    getline(f, line);
+    num_doc = 601;   // stoi will overflow on big dump
+
     output_file = "finalindex.txt";
     memory_size = 10;
 

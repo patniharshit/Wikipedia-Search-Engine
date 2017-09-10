@@ -70,13 +70,13 @@ def write_to_disk(cntr):
     for key in sorted(freq.keys()):
         for tup in freq[key]:
             if(tup[1] != 0):
-                body_str += str(tup[0])+'b'+str(tup[1])+'|'
+                body_str += str(tup[0])+'x'+str(tup[1])+'|'
             if(tup[2] != 0):
-                title_str += str(tup[0])+'t'+str(tup[2])+'|'
+                title_str += str(tup[0])+'x'+str(tup[2])+'|'
             if(tup[3] != 0):
-                categ_str += str(tup[0])+'c'+str(tup[3])+'|'
+                categ_str += str(tup[0])+'x'+str(tup[3])+'|'
             if(tup[4] != 0):
-                links_str += str(tup[0])+'l'+str(tup[4])+'|'
+                links_str += str(tup[0])+'x'+str(tup[4])+'|'
         if(body_str):
             bodyfile.write(str(key)+":"+str(body_str)+'\n')
         if(title_str):
@@ -224,3 +224,6 @@ for event, elem in etree.iterparse(argv[1], events=('start', 'end')):
         elem.clear()
 
 print("Total pages: {:,}".format(totalCount))
+
+cntfile = open('./index/cntfile', "w")
+cntfile.write(str(totalCount))
