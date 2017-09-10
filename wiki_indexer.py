@@ -19,9 +19,9 @@ stop_words.readStopWords()
 stemmer = Stemmer('english')
 freq = {}
 doc_freq = {}
-
 category_detection = re.compile(u"\[\[Category:(.*?)\]\]", re.M)
-
+file_cntr = 0
+file_step = 10
 
 def getCategories(text):
     cate = []
@@ -35,6 +35,7 @@ def getCategories(text):
     tokenisedWords = re.findall("\d+|[\w]+", data)
     tokenisedWords = [key.encode('utf-8') for key in tokenisedWords]
     return tokenisedWords
+
 
 def getExternalLinks(text):
     links = []
@@ -56,12 +57,10 @@ def getExternalLinks(text):
     return tokenisedWords
 
 
-def write_to_disk():
-    file = open(argv[2], "w")
-    # ans = sorted(freq, key=lambda key: freq[key])
+def write_to_disk(cntr):
+    file = open('./index/file'+str(cntr), "w")
     for key in sorted(freq.keys()):
         file.write(str(key)+":"+str(freq[key])+'\n')
-
 
 def update_dict(docid):
     for key in doc_freq:
@@ -159,6 +158,13 @@ for event, elem in etree.iterparse(argv[1], events=('start', 'end')):
             print(totalCount)
             if totalCount > 100:
                 break
+            if totalCount % file_step == 0:
+                write_to_disk(file_cntr)
+                elem.clear()
+                freq.clear()
+                doc_freq.clear()
+                file_cntr = file_cntr + 1
+                print('file_cntr: ' + str(file_cntr))
         elif tname == 'text':
             if elem.text is not None:
                 templinks = getExternalLinks(elem.text)
@@ -192,6 +198,4 @@ for event, elem in etree.iterparse(argv[1], events=('start', 'end')):
                 update_dict(id)
         elem.clear()
 
-# ans = sorted(freq, key=lambda key: freq[key], reverse=True)
-write_to_disk()
 print("Total pages: {:,}".format(totalCount))
