@@ -68,7 +68,7 @@ void mergeFiles() {
                             break;
                         }
                     }
-                    tokens.push_back(item.substr(0, i));
+                    tokens.push_back(item.substr(0, i+1));
                     tokens.push_back(item.substr(i+1, item.size()));
                 }
                 else {
@@ -113,7 +113,7 @@ void mergeFiles() {
                             break;
                         }
                     }
-                    tokens.push_back(item.substr(0, i));
+                    tokens.push_back(item.substr(0, i+1));
                     tokens.push_back(item.substr(i+1, item.size()));
                 }
                 else {
@@ -162,6 +162,38 @@ void mergeFiles() {
     }
     fPointers.erase(fPointers.begin(), fPointers.end());
     outFile.close();
+
+    string merged_postings = "mergedindex.txt";
+    ifstream *ff = new ifstream("finalindex.txt");
+    string aline, prev = "", curr;
+
+    ofstream foutFile;
+    foutFile.open(merged_postings);
+    string str_pos = "";
+    bool flag = false;
+
+    while(getline(*ff, aline)) {
+        int ii;
+        for(ii=0; ii<aline.size(); ii++) {
+            if(aline[ii] == ':') {
+                curr = aline.substr(0, ii);
+                break;
+            }
+        }
+        str_pos += aline.substr(ii+1, aline.size()-ii);
+        if(curr != prev and flag) {
+            foutFile << curr;
+            foutFile << str_pos + "\n";
+            str_pos = "";
+            flag = false;
+        }
+        else {
+            flag = true;
+        }
+        prev = curr;
+    }
+    delete ff;
+    foutFile.close();
 }
 
 int main(int argc, char* argv[]) {
