@@ -16,7 +16,7 @@ int save_buffer = 1024;
 int num_doc;
 
 string tfidf(int tf, int idf) {
-    string ans = to_string((1+log(tf))*log(num_doc/idf));
+    string ans = to_string((1+log10(tf))*log10(num_doc/idf));
     return ans;
 }
 
@@ -147,7 +147,7 @@ void mergeFiles(string field) {
                     }
                     string docid = record_buff[i][j].substr(0,k);
                     string num_occ = record_buff[i][j].substr(k+1, record_buff[i][j].size());
-                    str_rec += " " + docid + " " + tfidf(stoi(num_occ), (int)record_buff[i][j].size());
+                    str_rec += " " + docid + " " + tfidf(stoi(num_occ), (int)record_buff[i][j].size()/2);
                 }
                 str_rec += "\n";
                 outFile << str_rec;
@@ -170,7 +170,7 @@ void mergeFiles(string field) {
                 }
                 string docid = record_buff[i][j].substr(0,k);
                 string num_occ = record_buff[i][j].substr(k+1, record_buff[i][j].size());
-                str_rec += " " + docid + " " + tfidf(stoi(num_occ), (int)record_buff[i][j].size());
+                str_rec += " " + docid + " " + tfidf(stoi(num_occ), (int)record_buff[i][j].size()/2);
             }
             str_rec += "\n";
             outFile << str_rec;
