@@ -17,6 +17,12 @@ int num_doc;
 
 string tfidf(int tf, int idf) {
     string ans = to_string((1+log10(tf))*log10(num_doc/idf));
+    int y;
+    for(y=0; y<ans.size(); y++) {
+        if(ans[y]=='.')
+            break;
+    }
+    ans = ans.substr(0,y+3);
     return ans;
 }
 
@@ -95,6 +101,7 @@ void mergeFiles(string field) {
     int cntOB = 0;
     ofstream outFile;
     outFile.open(output_file);
+
     string str_rec;
     pair<vector<string>, int> ele;
     vector<vector<string> > record_buff;
@@ -219,6 +226,29 @@ void mergeFiles(string field) {
     foutFile.close();
 }
 
+void calcOffset(string field) {
+    ofstream outFile, offsetFile;
+    string offset_file = "./index/" + field + "_offset";
+    offsetFile.open(offset_file);
+    long long int offset_len = 0;
+    ifstream *f = new ifstream("index/" + field + ".index");
+    string line;
+
+    while(getline(*f, line)) {
+        int z;
+        for(z=0; z<line.size(); z++) {
+            if(line[z] == ' ') {
+                break;
+            }
+        }
+        string term = line.substr(0, z);
+        string to_offset = term + " " + to_string(offset_len) + "\n";
+        offset_len += (long long int)line.size();
+        offsetFile << to_offset;
+    }
+    offsetFile.close();
+}
+
 int main(int argc, char* argv[]) {
     string line;
     ifstream f ("./cntfile");
@@ -234,6 +264,10 @@ int main(int argc, char* argv[]) {
     mergeFiles("title");
     mergeFiles("categ");
     mergeFiles("links");
+    calcOffset("body");
+    calcOffset("title");
+    calcOffset("categ");
+    calcOffset("links");
 
     return 0;
 }
