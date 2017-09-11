@@ -90,6 +90,7 @@ def write_to_disk(cntr):
         categ_str = ""
         links_str = ""
 
+
 def update_dict(docid):
     flg = False
     for key in doc_freq:
