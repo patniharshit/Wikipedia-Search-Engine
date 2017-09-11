@@ -243,7 +243,7 @@ void calcOffset(string field) {
         }
         string term = line.substr(0, z);
         string to_offset = term + " " + to_string(offset_len) + "\n";
-        offset_len += (long long int)line.size();
+        offset_len += (long long int)line.size()+1;
         offsetFile << to_offset;
     }
     offsetFile.close();
